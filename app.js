@@ -3,6 +3,7 @@ import cors from "cors";
 // import { connectDB, sequelize } from "./config/db.js";
 import errorMiddleware from "./middleware/errorMiddleware.js";
 import UserRoute from "./routes/user.route.js";
+import ProductRoute from "./routes/product.route.js";
 const app = express();
 
 app.use(cors());
@@ -12,6 +13,7 @@ app.use(express.json());
 
 
 app.use("/user",UserRoute )
+app.use("/product",ProductRoute )
 
 
 

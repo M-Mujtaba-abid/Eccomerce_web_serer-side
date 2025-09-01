@@ -4,26 +4,113 @@ import ApiResponse from "../utils/apiResponse.js";
 import ApiError from "../utils/apiError.js";
 import asyncHandler from "../utils/asyncHandler.js";
 import jwt from "jsonwebtoken" 
+import cloudinary from "../config/cloudinary.js";
+import streamifier from "streamifier";
 
+// const registerUser = asyncHandler(async (req, res, next) => {
+//   const { firstName, lastName, email, password, phoneNumber, address, userRole } = req.body;
+
+//   const {profileImage} = req.file
+
+//  // Upload image using stream
+//   const streamUpload = (reqFile) => {
+//     return new Promise((resolve, reject) => {
+//       const stream = cloudinary.uploader.upload_stream(
+//         { folder: "products" },
+//         (error, result) => {
+//           if (result) resolve(result);
+//           else reject(error);
+//         }
+//       );
+//       streamifier.createReadStream(reqFile.buffer).pipe(stream);
+//     });
+//   };
+
+//   uploadedImage = await streamUpload(profileImage);
+
+//   // 1️⃣ Validate required fields
+//   if (!firstName || !lastName || !email || !password) {
+//     return next(new ApiError(400, "First name, last name, email, and password are required"));
+//   }
+
+//   // 2️⃣ Check if email already exists
+//   const existingUser = await User.findOne({ where: { email } });
+//   if (existingUser) {
+//     return next(new ApiError(400, "Email already registered"));
+//   }
+
+//   // 3️⃣ Hash password
+//   const hashedPassword = await bcrypt.hash(password, 10);
+
+//   // 4️⃣ Create user
+//   const newUser = await User.create({
+//     firstName,
+//     lastName,
+//     email,
+//     password: hashedPassword,
+//     phoneNumber,
+//     address,
+//     userRole: userRole || "user",
+//     profileImage,
+//   });
+
+//   // 5️⃣ Remove password before sending response
+//   const userResponse = {
+//     id: newUser.id,
+//     firstName: newUser.firstName,
+//     lastName: newUser.lastName,
+//     email: newUser.email,
+//     phoneNumber: newUser.phoneNumber,
+//     address: newUser.address,
+//     userRole: newUser.userRole,
+//     profileImage: newUser.profileImage,
+//     status: newUser.status,
+//     createdAt: newUser.createdAt,
+//   };
+
+//   // 6️⃣ Send success response
+//   res.status(201).json(new ApiResponse(201, userResponse, "User registered successfully"));
+// });
 
 const registerUser = asyncHandler(async (req, res, next) => {
-  const { firstName, lastName, email, password, phoneNumber, address, userRole, profileImage } = req.body;
+  const { firstName, lastName, email, password, phoneNumber, address, userRole } = req.body;
 
-  // 1️⃣ Validate required fields
+  // Check if file uploaded
+  if (!req.file) {
+    return next(new ApiError(400, "Profile image is required"));
+  }
+
+  // Upload image using stream
+  const streamUpload = (reqFile) => {
+    return new Promise((resolve, reject) => {
+      const stream = cloudinary.uploader.upload_stream(
+        { folder: "users" },
+        (error, result) => {
+          if (result) resolve(result);
+          else reject(error);
+        }
+      );
+      streamifier.createReadStream(reqFile.buffer).pipe(stream);
+    });
+  };
+
+  const uploadedImage = await streamUpload(req.file);
+
+  // Validate required fields
   if (!firstName || !lastName || !email || !password) {
     return next(new ApiError(400, "First name, last name, email, and password are required"));
   }
 
-  // 2️⃣ Check if email already exists
+  // Check if email exists
   const existingUser = await User.findOne({ where: { email } });
   if (existingUser) {
     return next(new ApiError(400, "Email already registered"));
   }
 
-  // 3️⃣ Hash password
+  // Hash password
   const hashedPassword = await bcrypt.hash(password, 10);
 
-  // 4️⃣ Create user
+  // Create user
   const newUser = await User.create({
     firstName,
     lastName,
@@ -31,11 +118,11 @@ const registerUser = asyncHandler(async (req, res, next) => {
     password: hashedPassword,
     phoneNumber,
     address,
-    userRole: userRole || "user",
-    profileImage,
+    userRole: userRole || "User",
+    profileImage: uploadedImage.secure_url,
   });
 
-  // 5️⃣ Remove password before sending response
+  // Prepare response
   const userResponse = {
     id: newUser.id,
     firstName: newUser.firstName,
@@ -49,11 +136,8 @@ const registerUser = asyncHandler(async (req, res, next) => {
     createdAt: newUser.createdAt,
   };
 
-  // 6️⃣ Send success response
   res.status(201).json(new ApiResponse(201, userResponse, "User registered successfully"));
 });
-
-
 
  const loginUser = asyncHandler(async (req, res, next) => {
   const { email, password , userRole } = req.body;
@@ -110,7 +194,6 @@ const registerUser = asyncHandler(async (req, res, next) => {
 
   res.status(200).json(new ApiResponse(200, { user: userResponse, token }, "Login successful"));
 });
-
 
 const logoutUser = asyncHandler(async (req, res, next) => {
   res.clearCookie("token", {

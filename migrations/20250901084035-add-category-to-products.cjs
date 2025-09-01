@@ -3,9 +3,9 @@
 module.exports = {
   async up(queryInterface, Sequelize) {
     await queryInterface.addColumn("Products", "category", {
-      type: Sequelize.ENUM("perfume", "accesories"),
+      type: Sequelize.ENUM("Men", "Women", "Children"),
       allowNull: false,
-      defaultValue: "perfume", // ✅ ek default rakhna zaroori hai ENUM me
+      defaultValue: "Men", // optional: taake purane rows pe issue na ho
     });
   },
 

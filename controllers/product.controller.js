@@ -4,18 +4,29 @@ import asyncHandler from "../utils/asyncHandler.js";
 import ApiError from "../utils/apiError.js";
 import ApiResponse from "../utils/apiResponse.js";
 import { Op } from "sequelize";
-
-
 import cloudinary from "../config/cloudinary.js";
-// import fs from "fs";
-
 import streamifier from "streamifier";
 
-export const createProduct = asyncHandler(async (req, res, next) => { 
-  const { title, description, status, price, stock, category } = req.body;
 
-  if (!title || !description || !status || !price || !stock || !req.file) {
-    return next(new ApiError(400, "All fields are required"));
+
+
+
+export const createProduct = asyncHandler(async (req, res, next) => { 
+  const { title, description, status, price, stock, category, Quantity } = req.body;
+
+  // Yahan logical OR (||) use karein, aur Quantity ka Q capital hai
+  if (
+    !title ||
+    !description ||
+    !status ||
+    !price ||
+    !stock ||
+    !req.file ||
+
+    !Quantity ||
+    !category
+  ) {
+    return next(new ApiError(400, "All fields are required line 29 "));
   }
 
   let uploadedImage;
@@ -44,6 +55,7 @@ export const createProduct = asyncHandler(async (req, res, next) => {
     price,
     stock,
     category,
+    Quantity,
     productImage: uploadedImage.secure_url,
   });
 
@@ -77,20 +89,15 @@ export const getProductById = asyncHandler(async (req, res, next) => {
 // ✅ Update Product
 export const updateProduct = asyncHandler(async (req, res, next) => {
   const { id } = req.params;
-  const { title, description, status, price, stock, category, productImage } = req.body;
+  const { title, description, status, price, stock, category, Quantity } = req.body;
 
   const product = await Product.findByPk(id);
   if (!product) {
     return next(new ApiError(404, "Product not found"));
   }
 
-  await product.update({ title, description, status, price, stock, productImage });
-
-
-
   let uploadedImageUrl = product.productImage; // default: old image
 
-  // Agar nayi file bheji gayi hai
   if (req.file) {
     const streamUpload = (reqFile) => {
       return new Promise((resolve, reject) => {
@@ -117,6 +124,7 @@ export const updateProduct = asyncHandler(async (req, res, next) => {
     price,
     stock,
     category,
+    Quantity,
     productImage: uploadedImageUrl, // old or new
   });
 
@@ -195,6 +203,21 @@ export const getProductsByCategory = asyncHandler(async (req, res, next) => {
   res
     .status(200)
     .json(new ApiResponse(200, products, `Products in category: ${category}`));
+});
+
+
+// ✅ Get Number of Total Products
+export const getNumberOfTotalproduct = asyncHandler(async (req, res, next) => {
+  try {
+    
+    const totalProducts = await Product.count(); // Sequelize ka built-in count method
+
+    res
+      .status(200)
+      .json(new ApiResponse(200, { totalProducts }, "Total products count fetched successfully"));
+  } catch (error) {
+    return next(new ApiError(500, "Failed to fetch total products count"));
+  }
 });
 
 

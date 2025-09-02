@@ -11,27 +11,84 @@ import streamifier from "streamifier";
 
 
 
-export const createProduct = asyncHandler(async (req, res, next) => { 
-  const { title, description, status, price, stock, category, Quantity } = req.body;
+// export const createProduct = asyncHandler(async (req, res, next) => { 
+//   const { title, description, status, price, stock, category, Quantity,} = req.body;
 
-  // Yahan logical OR (||) use karein, aur Quantity ka Q capital hai
+//   // Yahan logical OR (||) use karein, aur Quantity ka Q capital hai
+//   if (
+//     !title ||
+//     !description ||
+//     !status ||
+//     !price ||
+//     !stock ||
+//     !req.file ||
+//     !Quantity ||
+//     !category
+//   ) {
+//     return next(new ApiError(400, "All fields are required line 29 "));
+//   }
+
+//   let uploadedImage;
+
+//   // Upload image using stream
+//   const streamUpload = (reqFile) => {
+//     return new Promise((resolve, reject) => {
+//       const stream = cloudinary.uploader.upload_stream(
+//         { folder: "products" },
+//         (error, result) => {
+//           if (result) resolve(result);
+//           else reject(error);
+//         }
+//       );
+//       streamifier.createReadStream(reqFile.buffer).pipe(stream);
+//     });
+//   };
+
+//   uploadedImage = await streamUpload(req.file);
+
+//   // Create product
+//   const newProduct = await Product.create({
+//     title,
+//     description,
+//     status,
+//     price,
+//     stock,
+//     category,
+//     Quantity,
+//     productImage: uploadedImage.secure_url,
+//   });
+
+//   return res
+//     .status(201)
+//     .json(new ApiResponse(201, newProduct, "Product created successfully"));
+// });
+
+
+
+
+// ✅ Get All Products
+
+
+// CREATE Product
+
+//create
+
+
+export const createProduct = asyncHandler(async (req, res, next) => {
+  const { 
+    title, description, status, price, stock, category, Quantity,
+    isFeatured, isNewArrival, isOnSale, discountPrice
+  } = req.body;
+
   if (
-    !title ||
-    !description ||
-    !status ||
-    !price ||
-    !stock ||
-    !req.file ||
-
-    !Quantity ||
-    !category
+    !title || !description || !status || !price || !stock || !req.file ||
+    !Quantity || !category
   ) {
-    return next(new ApiError(400, "All fields are required line 29 "));
+    return next(new ApiError(400, "All fields are required"));
   }
 
   let uploadedImage;
 
-  // Upload image using stream
   const streamUpload = (reqFile) => {
     return new Promise((resolve, reject) => {
       const stream = cloudinary.uploader.upload_stream(
@@ -47,7 +104,6 @@ export const createProduct = asyncHandler(async (req, res, next) => {
 
   uploadedImage = await streamUpload(req.file);
 
-  // Create product
   const newProduct = await Product.create({
     title,
     description,
@@ -57,13 +113,24 @@ export const createProduct = asyncHandler(async (req, res, next) => {
     category,
     Quantity,
     productImage: uploadedImage.secure_url,
+    isFeatured,
+    isNewArrival,
+    isOnSale,
+    discountPrice
   });
 
   return res
     .status(201)
     .json(new ApiResponse(201, newProduct, "Product created successfully"));
 });
-// ✅ Get All Products
+
+
+
+
+
+
+
+
 export const getAllProducts = asyncHandler(async (req, res, next) => {
   const products = await Product.findAll();
 
@@ -72,7 +139,16 @@ export const getAllProducts = asyncHandler(async (req, res, next) => {
     .json(new ApiResponse(200, products, "Products fetched successfully"));
 });
 
-// ✅ Get Single Product by ID
+
+
+
+
+
+
+
+
+// ✅ Get Single Product by 
+
 export const getProductById = asyncHandler(async (req, res, next) => {
   const { id } = req.params;
   const product = await Product.findByPk(id);
@@ -86,17 +162,69 @@ export const getProductById = asyncHandler(async (req, res, next) => {
     .json(new ApiResponse(200, product, "Product fetched successfully"));
 });
 
+
+
 // ✅ Update Product
+// export const updateProduct = asyncHandler(async (req, res, next) => {
+//   const { id } = req.params;
+//   const { title, description, status, price, stock, category, Quantity } = req.body;
+
+//   const product = await Product.findByPk(id);
+//   if (!product) {
+//     return next(new ApiError(404, "Product not found"));
+//   }
+
+//   let uploadedImageUrl = product.productImage; // default: old image
+
+//   if (req.file) {
+//     const streamUpload = (reqFile) => {
+//       return new Promise((resolve, reject) => {
+//         const stream = cloudinary.uploader.upload_stream(
+//           { folder: "products" },
+//           (error, result) => {
+//             if (result) resolve(result);
+//             else reject(error);
+//           }
+//         );
+//         streamifier.createReadStream(reqFile.buffer).pipe(stream);
+//       });
+//     };
+
+//     const uploadedImage = await streamUpload(req.file);
+//     uploadedImageUrl = uploadedImage.secure_url;
+//   }
+
+//   // Update product fields
+//   await product.update({
+//     title,
+//     description,
+//     status,
+//     price,
+//     stock,
+//     category,
+//     Quantity,
+//     productImage: uploadedImageUrl, // old or new
+//   });
+
+//   return res
+//     .status(200)
+//     .json(new ApiResponse(200, product, "Product updated successfully"));
+// });
+
+// UPDATE Product
 export const updateProduct = asyncHandler(async (req, res, next) => {
   const { id } = req.params;
-  const { title, description, status, price, stock, category, Quantity } = req.body;
+  const { 
+    title, description, status, price, stock, category, Quantity,
+    isFeatured, isNewArrival, isOnSale, discountPrice
+  } = req.body;
 
   const product = await Product.findByPk(id);
   if (!product) {
     return next(new ApiError(404, "Product not found"));
   }
 
-  let uploadedImageUrl = product.productImage; // default: old image
+  let uploadedImageUrl = product.productImage;
 
   if (req.file) {
     const streamUpload = (reqFile) => {
@@ -116,7 +244,6 @@ export const updateProduct = asyncHandler(async (req, res, next) => {
     uploadedImageUrl = uploadedImage.secure_url;
   }
 
-  // Update product fields
   await product.update({
     title,
     description,
@@ -125,13 +252,20 @@ export const updateProduct = asyncHandler(async (req, res, next) => {
     stock,
     category,
     Quantity,
-    productImage: uploadedImageUrl, // old or new
+    productImage: uploadedImageUrl,
+    isFeatured,
+    isNewArrival,
+    isOnSale,
+    discountPrice
   });
 
   return res
     .status(200)
     .json(new ApiResponse(200, product, "Product updated successfully"));
 });
+
+
+
 
 // ✅ Delete Product
 export const deleteProduct = asyncHandler(async (req, res, next) => {
@@ -220,4 +354,20 @@ export const getNumberOfTotalproduct = asyncHandler(async (req, res, next) => {
   }
 });
 
+
+
+export const getFeaturedProducts = asyncHandler(async (req, res) => {
+  const products = await Product.findAll({ where: { isFeatured: true } });
+  res.status(200).json(new ApiResponse(200, products, "Featured products"));
+});
+
+export const getNewArrivals = asyncHandler(async (req, res) => {
+  const products = await Product.findAll({ where: { isNewArrival: true } });
+  res.status(200).json(new ApiResponse(200, products, "New Arrivals"));
+});
+
+export const getOnSaleProducts = asyncHandler(async (req, res) => {
+  const products = await Product.findAll({ where: { isOnSale: true } });
+  res.status(200).json(new ApiResponse(200, products, "On Sale products"));
+});
 

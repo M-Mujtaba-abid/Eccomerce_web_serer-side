@@ -28,15 +28,32 @@ const Product = sequelize.define(
       type: DataTypes.STRING,
       allowNull: false,
     },
- category: {
-  type: DataTypes.ENUM("Men", "Women", "Children"),
-  allowNull: false,
-},
+    category: {
+      type: DataTypes.ENUM("Men", "Women", "Children"),
+      allowNull: false,
+    },
     Quantity: {
-  type: DataTypes.ENUM("15ML", "50ML", "100ML"),
-  allowNull: false,
-}
+      type: DataTypes.ENUM("15ML", "50ML", "100ML"),
+      allowNull: false,
+    },
 
+    // 🟢 Homepage Control Fields
+    isFeatured: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false, // admin check kare to true hoga
+    },
+    isNewArrival: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+    },
+    isOnSale: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+    },
+    discountPrice: {
+      type: DataTypes.FLOAT,
+      allowNull: true, // sirf tab required jab isOnSale true ho
+    },
   },
   {
     tableName: "Products",
@@ -48,6 +65,5 @@ const Product = sequelize.define(
 // Product.associate = (models) => {
 //   Product.hasMany(models.Order);
 // };
-
 
 export default Product;

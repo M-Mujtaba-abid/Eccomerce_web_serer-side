@@ -4,6 +4,7 @@ import cors from "cors";
 import errorMiddleware from "./middleware/errorMiddleware.js";
 import UserRoute from "./routes/user.route.js";
 import ProductRoute from "./routes/product.route.js";
+import cartItemRoute from "./routes/cartItem.route.js";
 const app = express();
 
 app.use(
@@ -19,6 +20,9 @@ app.use(express.json());
 
 app.use("/user",UserRoute )
 app.use("/product",ProductRoute )
+app.use("/cartitem",cartItemRoute )
+app.use("/order",orderRoute )
+app.use("/orderitem",orderItemRoute )
 
 
 

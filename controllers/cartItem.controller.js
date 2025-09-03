@@ -7,18 +7,21 @@ import asyncHandler from "../utils/asyncHandler.js";
 
 // Add item to cart
 export const addToCart = asyncHandler(async (req, res) => {
-  const { productId, quantity } = req.body;
-  const userId = req.user.id; // assume user is logged in (from auth middleware)
+  const {  quantity } = req.body;
+  const { productId } = req.params;
 
+  const userId = req.user.id; // assume user is logged in (from auth middleware)
+console.log(`user id ye he ${userId}  and product id ye he  ${productId} or quanitty ye h e${quantity}`)
   // check product exists
+
   const product = await Product.findByPk(productId);
   if (!product) throw new ApiError(404, "Product not found");
-
+ 
   // check if already in cart
   let cartItem = await CartItem.findOne({
     where: { userId, productId },
   });
-
+  
   if (cartItem) {
     // update quantity only, priceAtAddition same rahega
     cartItem.quantity += quantity;
@@ -47,7 +50,7 @@ export const getUserCart = asyncHandler(async (req, res) => {
 
   const cartItems = await CartItem.findAll({
     where: { userId },
-    include: [{ model: Product }, { model: User, attributes: ["id", "name", "email"] }],
+    include: [{ model: Product }, { model: User, attributes: ["id", "firstName", "email"] }],
   });
 
   // attach totalPrice for each item

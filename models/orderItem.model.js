@@ -1,6 +1,6 @@
 // models/orderItem.model.js
 import { DataTypes } from "sequelize";
-import sequelize from "../config/db.js";
+import {sequelize} from "../config/db.js";
 import Order from "./order.model.js";
 import Product from "./product.model.js";
 

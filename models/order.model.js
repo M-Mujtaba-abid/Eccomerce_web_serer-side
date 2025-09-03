@@ -1,7 +1,10 @@
 // models/order.model.js
 import { DataTypes } from "sequelize";
-import sequelize from "../config/db.js";
+import {sequelize} from "../config/db.js";
 import User from "./user.model.js";
+// import OrderItem from "./orderItem.model.js";
+// import Order from "./order.model.js";
+// import OrderItem from "./orderItem.model.js";
 
 const Order = sequelize.define(
   "Order",
@@ -47,7 +50,7 @@ const Order = sequelize.define(
   { timestamps: true }
 );
 
-// relation
+// // relation
 User.hasMany(Order, { foreignKey: "userId" });
 Order.belongsTo(User, { foreignKey: "userId" });
 

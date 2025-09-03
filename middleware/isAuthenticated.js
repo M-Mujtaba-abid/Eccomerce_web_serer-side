@@ -1,9 +1,11 @@
 import jwt from "jsonwebtoken";
-import { User } from "../models/user.model.js";
+import User from "../models/user.model.js";
 
 export const isAuthenticated = async (req, res, next) => {
   try {
-    let token = req.cookies?.token || req.headers["authorization"]?.split(" ")[1];
+    let token = req.cookies?.token 
+
+    console.log("ye token arha he ",token )
 
     if (!token) return res.status(401).json({ message: "Unauthorized, No Token" });
 

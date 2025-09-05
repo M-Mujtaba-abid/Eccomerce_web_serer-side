@@ -13,7 +13,9 @@ const app = express();
 
 app.use(
   cors({
-    origin: "http://localhost:5173", // front-end URL
+    // origin: "http://localhost:5173", // front-end URL
+    origin: "https://theluxuryfragrances.vercel.app/", // front-end URL
+
     credentials: true, // ✅ cookies ke liye required
   })
 );

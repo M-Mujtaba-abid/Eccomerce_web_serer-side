@@ -29,6 +29,7 @@
 // config/db.js
 import { Sequelize } from "sequelize";
 import dotenv from "dotenv";
+
 dotenv.config();
 
 export const sequelize = new Sequelize(
@@ -40,10 +41,16 @@ export const sequelize = new Sequelize(
     port: process.env.DB_PORT,
     dialect: "postgres",
     logging: false,
+    dialectOptions: {
+      ssl: {
+        require: true,
+        rejectUnauthorized: false, // important for hosted Postgres
+      },
+    },
   }
 );
 
-// Export connectDB for index.js
+// Optional: Test connection
 export const connectDB = async () => {
   try {
     await sequelize.authenticate();
@@ -52,3 +59,4 @@ export const connectDB = async () => {
     console.error("Unable to connect to the database:", err);
   }
 };
+

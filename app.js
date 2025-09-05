@@ -102,7 +102,7 @@ const startServer = async () => {
     await sequelize.authenticate(); // Test DB connection
     console.log("Postgres + Sequelize connected successfully");
 
-    await sequelize.sync({ alter: true }); // Sync all models
+    await sequelize.sync({ force: true }); // Sync all models
     console.log("All models synced successfully");
 
     const PORT = process.env.PORT || 8000;

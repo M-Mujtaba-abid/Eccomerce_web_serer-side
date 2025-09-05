@@ -32,7 +32,7 @@ const User = sequelize.define("User", {
   },
   userRole: {
     type: DataTypes.ENUM("User", "Admin"),
-    defaultValue: "user",
+    defaultValue: "User",
   },
   profileImage: {
     type: DataTypes.STRING, // store image URL (Cloudinary/local path)

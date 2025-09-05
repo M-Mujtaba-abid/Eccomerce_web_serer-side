@@ -11,14 +11,18 @@ import paymentRoute from "./routes/payment.route.js";
 
 const app = express();
 
-app.use(
-  cors({
-    // origin: "http://localhost:5173", // front-end URL
-    origin: "https://theluxuryfragrances.vercel.app/", // front-end URL
+// app.use(
+//   cors({
+//     origin: "http://localhost:5173", // front-end URL
+//     credentials: true, // ✅ cookies ke liye required
+//   })
+// );
+app.use(cors({
+  origin: "https://theluxuryfragrances.vercel.app", // no trailing slash
+  methods: ["GET","POST","PUT","DELETE"],
+  credentials: true // if you use cookies/auth headers
+}));
 
-    credentials: true, // ✅ cookies ke liye required
-  })
-);
 app.use(express.json());
 app.use(cookieParser()); // <-- Add this line
 

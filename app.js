@@ -24,7 +24,8 @@ app.use("/user",UserRoute )
 app.use("/product",ProductRoute )
 app.use("/cartitem",cartItemRoute )
 app.use("/order",orderRoute )
-app.use("/payment",paymentRoute )
+app.use("/payment",paymentRoute)
+
 // app.use("/orderitem",orderItemRoute )
 
 

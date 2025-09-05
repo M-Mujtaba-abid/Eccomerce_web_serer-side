@@ -89,19 +89,6 @@ export const createOrder = asyncHandler(async (req, res) => {
 });
 
 // Get all orders of logged-in user
-// export const getUserOrders = asyncHandler(async (req, res) => {
-//   const userId = req.user.id;
-
-//   const orders = await Order.findAll({
-//     where: { userId },
-//     include: [{ model: User, attributes: ["id", "firstName", "email"] }],
-//     order: [["createdAt", "DESC"]],
-//   });
-
-//   res
-//     .status(200)
-//     .json(new ApiResponse(200, orders, "User orders fetched successfully"));
-// });
 export const getUserOrders = asyncHandler(async (req, res) => {
   const userId = req.user.id;
 
@@ -160,4 +147,75 @@ export const deleteOrder = asyncHandler(async (req, res) => {
   res
     .status(200)
     .json(new ApiResponse(200, {}, "Order deleted successfully"));
+});
+
+
+// Get all orders (Admin use case)
+export const getAllOrders = asyncHandler(async (req, res) => {
+  const orders = await Order.findAll({
+    include: [
+      {
+        model: User,
+        attributes: ["id", "firstName", "email"],
+      },
+      {
+        model: orderItem,
+        include: [
+          {
+            model: Product,
+            attributes: ["id", "title", "productImage", "price"],
+          },
+        ],
+      },
+    ],
+    order: [["createdAt", "DESC"]], // latest orders first
+  });
+
+  res.status(200).json({
+    success: true,
+    message: "All user orders fetched successfully",
+    data: orders,
+  });
+});
+
+// Get single order details by ID
+export const getOrderById = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+
+  const order = await Order.findByPk(id, {
+    include: [
+      {
+        model: User,
+        attributes: ["id", "firstName", "email"],
+      },
+      {
+        model: orderItem,
+        include: [
+          {
+            model: Product,
+            attributes: ["id", "title", "productImage", "price"],
+          },
+        ],
+      },
+    ],
+  });
+
+  if (!order) throw new ApiError(404, "Order not found");
+
+  res.status(200).json({
+    success: true,
+    message: "Order details fetched successfully",
+    data: order,
+  });
+});
+
+// Get total number of orders
+export const getTotalOrders = asyncHandler(async (req, res) => {
+  const totalOrders = await Order.count();
+
+  res.status(200).json({
+    success: true,
+    message: "Total number of orders fetched successfully",
+    data: { totalOrders },
+  });
 });

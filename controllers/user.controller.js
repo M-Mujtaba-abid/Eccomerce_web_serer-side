@@ -205,5 +205,14 @@ const logoutUser = asyncHandler(async (req, res, next) => {
   res.status(200).json(new ApiResponse(200, {}, "Logout successful"));
 });
 
+const totalUser =asyncHandler(async(req,res)=>{
+  const  totalUser=await User.count()
 
-export {registerUser ,loginUser, logoutUser}
+  res.status(200).json({
+    success: true,
+    message: "Total number of orders fetched successfully",
+    data: { totalUser },
+  });
+})
+
+export {registerUser ,loginUser, logoutUser, totalUser}

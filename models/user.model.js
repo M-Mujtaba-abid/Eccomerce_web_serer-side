@@ -36,7 +36,8 @@ const User = sequelize.define("User", {
   },
   profileImage: {
     type: DataTypes.STRING, // store image URL (Cloudinary/local path)
-    allowNull: true,
+    allowNull: false,
+     defaultValue: 'default.jpg',
   },
   status: {
     type: DataTypes.ENUM("active", "inactive"),

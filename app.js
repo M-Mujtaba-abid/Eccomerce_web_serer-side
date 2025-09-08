@@ -27,10 +27,12 @@ dotenv.config();
 // }));
 
 app.use(cors({
-  origin: [process.env.CLIENT_URL, process.env.LOCAL_URL],
+  origin: ["https://luxuryfragrancemz.vercel.app" , "http://localhost:5173"],
   methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
   credentials: true
 }));
+
+console.log(`ye hosted version he ${process.env.CLIENT_URL} and ye local host he ${process.env.LOCAL_URL} `)
 
 app.use(express.json());
 app.use(cookieParser());

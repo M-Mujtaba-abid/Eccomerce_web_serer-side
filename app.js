@@ -15,6 +15,7 @@ import paymentRoute from "./routes/payment.route.js";
 
 const app = express();
 dotenv.config();
+
 // ------------------- Middleware -------------------
 
 
@@ -26,7 +27,7 @@ dotenv.config();
 // }));
 
 app.use(cors({
-  origin: [process.env.CLIENT_URL, process.env.LOCAL_URL], // dono URLs
+  origin:  "https://luxuryfragrancemz.vercel.app", // dono URLs
   methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
   credentials: true
 }));

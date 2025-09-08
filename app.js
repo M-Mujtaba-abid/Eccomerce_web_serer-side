@@ -14,7 +14,7 @@ import orderRoute from "./routes/order.route.js";
 import paymentRoute from "./routes/payment.route.js";
 
 const app = express();
-dotenv.config()
+dotenv.config();
 // ------------------- Middleware -------------------
 
 

@@ -5,7 +5,7 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import { sequelize } from "./config/db.js";
 import errorMiddleware from "./middleware/errorMiddleware.js";
-import dotenv from "dotenv""
+import dotenv from "dotenv"
 // Import routes
 import UserRoute from "./routes/user.route.js";
 import ProductRoute from "./routes/product.route.js";

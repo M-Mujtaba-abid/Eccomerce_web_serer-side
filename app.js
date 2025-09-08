@@ -17,9 +17,10 @@ const app = express();
 
 // ------------------- Middleware -------------------
 
+
 // CORS for Vercel frontend
 app.use(cors({
-  origin: "https://luxuryfragrancemz.vercel.app" , // no trailing slash
+  origin: process.env.CLIENT_URL , // no trailing slash
   methods: ["GET", "POST", "PUT", "DELETE","PATCH"],
   credentials: true, // for cookies/auth headers
 }));
@@ -53,8 +54,8 @@ const startServer = async () => {
     await sequelize.sync({ alter: true }); // Sync all models
     console.log("All models synced successfully");
 
-    // const PORT = process.env.PORT || 8000;
-    // app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+    const PORT = process.env.PORT || 8000;
+    app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 
   } catch (err) {
     console.error("Unable to connect to the database:", err);

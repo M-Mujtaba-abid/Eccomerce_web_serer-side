@@ -5,7 +5,7 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import { sequelize } from "./config/db.js";
 import errorMiddleware from "./middleware/errorMiddleware.js";
-
+import dotenv from "dotenv""
 // Import routes
 import UserRoute from "./routes/user.route.js";
 import ProductRoute from "./routes/product.route.js";
@@ -14,15 +14,21 @@ import orderRoute from "./routes/order.route.js";
 import paymentRoute from "./routes/payment.route.js";
 
 const app = express();
-
+dotenv.config()
 // ------------------- Middleware -------------------
 
 
 // CORS for Vercel frontend
+// app.use(cors({
+//   origin: process.env.CLIENT_URL , // no trailing slash
+//   methods: ["GET", "POST", "PUT", "DELETE","PATCH"],
+//   credentials: true, // for cookies/auth headers
+// }));
+
 app.use(cors({
-  origin: process.env.CLIENT_URL , // no trailing slash
-  methods: ["GET", "POST", "PUT", "DELETE","PATCH"],
-  credentials: true, // for cookies/auth headers
+  origin: [process.env.CLIENT_URL, process.env.LOCAL_URL], // dono URLs
+  methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
+  credentials: true
 }));
 
 app.use(express.json());

@@ -27,7 +27,7 @@ dotenv.config();
 // }));
 
 app.use(cors({
-  origin:  "https://luxuryfragrancemz.vercel.app", // dono URLs
+  origin: [process.env.CLIENT_URL, process.env.LOCAL_URL],
   methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
   credentials: true
 }));

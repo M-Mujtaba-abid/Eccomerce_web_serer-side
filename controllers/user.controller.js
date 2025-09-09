@@ -7,70 +7,8 @@ import jwt from "jsonwebtoken"
 import cloudinary from "../config/cloudinary.js";
 import streamifier from "streamifier";
 
-// const registerUser = asyncHandler(async (req, res, next) => {
-//   const { firstName, lastName, email, password, phoneNumber, address, userRole } = req.body;
 
-//   const {profileImage} = req.file
 
-//  // Upload image using stream
-//   const streamUpload = (reqFile) => {
-//     return new Promise((resolve, reject) => {
-//       const stream = cloudinary.uploader.upload_stream(
-//         { folder: "products" },
-//         (error, result) => {
-//           if (result) resolve(result);
-//           else reject(error);
-//         }
-//       );
-//       streamifier.createReadStream(reqFile.buffer).pipe(stream);
-//     });
-//   };
-
-//   uploadedImage = await streamUpload(profileImage);
-
-//   // 1️⃣ Validate required fields
-//   if (!firstName || !lastName || !email || !password) {
-//     return next(new ApiError(400, "First name, last name, email, and password are required"));
-//   }
-
-//   // 2️⃣ Check if email already exists
-//   const existingUser = await User.findOne({ where: { email } });
-//   if (existingUser) {
-//     return next(new ApiError(400, "Email already registered"));
-//   }
-
-//   // 3️⃣ Hash password
-//   const hashedPassword = await bcrypt.hash(password, 10);
-
-//   // 4️⃣ Create user
-//   const newUser = await User.create({
-//     firstName,
-//     lastName,
-//     email,
-//     password: hashedPassword,
-//     phoneNumber,
-//     address,
-//     userRole: userRole || "user",
-//     profileImage,
-//   });
-
-//   // 5️⃣ Remove password before sending response
-//   const userResponse = {
-//     id: newUser.id,
-//     firstName: newUser.firstName,
-//     lastName: newUser.lastName,
-//     email: newUser.email,
-//     phoneNumber: newUser.phoneNumber,
-//     address: newUser.address,
-//     userRole: newUser.userRole,
-//     profileImage: newUser.profileImage,
-//     status: newUser.status,
-//     createdAt: newUser.createdAt,
-//   };
-
-//   // 6️⃣ Send success response
-//   res.status(201).json(new ApiResponse(201, userResponse, "User registered successfully"));
-// });
 
 const registerUser = asyncHandler(async (req, res, next) => {
   const { firstName, lastName, email, password, phoneNumber, address, userRole } = req.body;
@@ -238,4 +176,50 @@ const getUserProfile = asyncHandler(async (req, res, next) => {
 });
 
 
-export {registerUser ,loginUser, logoutUser, totalUser, getUserProfile}
+const updateUserProfile = asyncHandler(async (req, res) => {
+  const { firstName, lastName, email, phoneNumber, address } = req.body;
+  const file = req.file;
+
+  // Helper to upload file to Cloudinary via stream
+  const streamUpload = (reqFile) => {
+    return new Promise((resolve, reject) => {
+      const stream = cloudinary.uploader.upload_stream(
+        { folder: "users" },
+        (error, result) => {
+          if (result) resolve(result);
+          else reject(error);
+        }
+      );
+      streamifier.createReadStream(reqFile.buffer).pipe(stream);
+    });
+  };
+
+  let profileImageUrl;
+  if (file) {
+    const uploaded = await streamUpload(file);
+    profileImageUrl = uploaded.secure_url;
+  }
+
+  const user = await User.findByPk(req.user.id);
+  if (!user) {
+    return res.status(404).json({ message: "User not found" });
+  }
+
+  user.firstName = firstName || user.firstName;
+  user.lastName = lastName || user.lastName;
+  user.email = email || user.email;
+  user.phoneNumber = phoneNumber || user.phoneNumber;
+  user.address = address || user.address;
+  if (profileImageUrl) user.profileImage = profileImageUrl;
+
+  await user.save();
+
+  res.status(200).json({
+    success: true,
+    message: "User profile updated successfully",
+    data: user,
+  });
+});
+
+
+export {registerUser ,loginUser, logoutUser, totalUser, getUserProfile,updateUserProfile}

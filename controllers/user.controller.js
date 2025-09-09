@@ -185,13 +185,21 @@ const registerUser = asyncHandler(async (req, res, next) => {
   };
 
   // 6️⃣ Send response with cookie
-  res.cookie("token", token, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "none",
-    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-  });
+  // res.cookie("token", token, {
+  //   httpOnly: true,
+  //   secure: process.env.NODE_ENV === "production",
+  //   sameSite: "None",
+  //   maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+  // });
+ const isProd = process.env.NODE_ENV === "production";
 
+res.cookie("token", token, {
+  httpOnly: true,
+  secure: isProd,                 // false on localhost, true on prod
+  sameSite: isProd ? "none" : "lax", // none for cross-site prod, lax on localhost
+  path: "/",
+  maxAge: 7 * 24 * 60 * 60 * 1000,
+});
   res.status(200).json(new ApiResponse(200, { user: userResponse, token }, "Login successful"));
 });
 
@@ -215,4 +223,19 @@ const totalUser =asyncHandler(async(req,res)=>{
   });
 })
 
-export {registerUser ,loginUser, logoutUser, totalUser}
+
+const getUserProfile = asyncHandler(async (req, res, next) => {
+  try {
+    // user is already attached from middleware
+    const user = req.user;
+
+    res.status(200).json(
+      new ApiResponse(200, user, "User profile retrieved successfully")
+    );
+  } catch (error) {
+    next(new ApiError(500, "Error retrieving user profile"));
+  }
+});
+
+
+export {registerUser ,loginUser, logoutUser, totalUser, getUserProfile}

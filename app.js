@@ -19,12 +19,6 @@ dotenv.config();
 // ------------------- Middleware -------------------
 
 
-// CORS for Vercel frontend
-// app.use(cors({
-//   origin: process.env.CLIENT_URL , // no trailing slash
-//   methods: ["GET", "POST", "PUT", "DELETE","PATCH"],
-//   credentials: true, // for cookies/auth headers
-// }));
 
 app.use(cors({
   origin: ["https://luxuryfragrancemz.vercel.app" , "http://localhost:5173"],

@@ -226,36 +226,6 @@ export const deleteProduct = asyncHandler(async (req, res, next) => {
     .json(new ApiResponse(200, {}, "Product deleted successfully"));
 });
 
-//searchProducts
-// export const searchProducts = async (req, res, next) => {
-//   try {
-//     const { q } = req.query;  // query param ?q=apple
-
-//     if (!q) {
-//       return res.status(400).json({ message: "Search query is required" });
-//     }
-
-//     const products = await Product.findAll({
-//       where: {
-//         [Op.or]: [
-//           { title: { [Op.like]: `%${q}%` } },
-//           { description: { [Op.like]: `%${q}%` } },
-//           { category: { [Op.like]: `%${q}%` } },
-//         ],
-//       },
-//     });
-
-//     if (products.length === 0) {
-//       return res.status(404).json({ message: "No products found" });
-//     }
-
-//     res.status(200).json(products);
-//   } catch (error) {
-//     next(error);
-//   }
-// };
-
-// controller: searchProducts
 
 export const searchProducts = async (req, res, next) => {
   try {

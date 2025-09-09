@@ -221,5 +221,46 @@ const updateUserProfile = asyncHandler(async (req, res) => {
   });
 });
 
+const updatePassword = asyncHandler(async (req, res, next) => {
+  const { oldPassword, newPassword, confirmPassword } = req.body;
 
-export {registerUser ,loginUser, logoutUser, totalUser, getUserProfile,updateUserProfile}
+  // 1️⃣ Validate fields
+  if (!oldPassword || !newPassword || !confirmPassword) {
+    return next(new ApiError(400, "All fields are required"));
+  }
+
+  // 2️⃣ Check new password & confirm
+  if (newPassword !== confirmPassword) {
+    return next(new ApiError(400, "New password and confirm password must match"));
+  }
+
+  // 3️⃣ Find logged-in user
+  const user = await User.findByPk(req.user.id);
+  if (!user) {
+    return next(new ApiError(404, "User not found"));
+  }
+
+  // 4️⃣ Match old password
+  const isMatch = await bcrypt.compare(oldPassword, user.password);
+  if (!isMatch) {
+    return next(new ApiError(400, "Old password is incorrect"));
+  }
+
+  // 5️⃣ Hash new password
+  const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+  // 6️⃣ Save new password
+  user.password = hashedPassword;
+  await user.save();
+
+  // 7️⃣ Response
+  res.status(200).json(
+    new ApiResponse(200, {}, "Password updated successfully")
+  );
+});
+
+
+
+
+
+export {registerUser ,loginUser, logoutUser, totalUser, getUserProfile,updateUserProfile ,updatePassword}

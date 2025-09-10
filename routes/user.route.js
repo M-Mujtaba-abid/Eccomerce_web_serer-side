@@ -1,5 +1,5 @@
 import express from "express";
-import { getUserProfile, loginUser, logoutUser, registerUser, totalUser, updatePassword, updateUserProfile } from "../controllers/user.controller.js";
+import { forgotPassword, getUserProfile, loginUser, logoutUser, registerUser, resetPassword, totalUser, updatePassword, updateUserProfile, verifyOtp } from "../controllers/user.controller.js";
 import { upload } from "../middleware/multer.js";
 import { isAuthenticated } from "../middleware/isAuthenticated.js";
 
@@ -14,5 +14,9 @@ router.get("/totaluser", totalUser);
 router.get("/getuserprofile", isAuthenticated, getUserProfile);
 router.patch("/updateuserprofile", isAuthenticated, upload.single("profileImage"), updateUserProfile);
 router.patch("/updatepassword", isAuthenticated, updatePassword);
+
+router.post("/forgetpassword", forgotPassword);
+router.post("/verifyotp", verifyOtp);
+router.post("/resetpassword", resetPassword);
 
 export default router;

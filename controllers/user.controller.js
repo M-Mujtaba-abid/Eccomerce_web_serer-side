@@ -6,6 +6,7 @@ import asyncHandler from "../utils/asyncHandler.js";
 import jwt from "jsonwebtoken" 
 import cloudinary from "../config/cloudinary.js";
 import streamifier from "streamifier";
+import sendEmail from "../utils/sendEmail.js";
 
 
 
@@ -122,13 +123,8 @@ const registerUser = asyncHandler(async (req, res, next) => {
     createdAt: user.createdAt,
   };
 
-  // 6️⃣ Send response with cookie
-  // res.cookie("token", token, {
-  //   httpOnly: true,
-  //   secure: process.env.NODE_ENV === "production",
-  //   sameSite: "None",
-  //   maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-  // });
+ 
+ 
  const isProd = process.env.NODE_ENV === "production";
 
 res.cookie("token", token, {
@@ -259,8 +255,73 @@ const updatePassword = asyncHandler(async (req, res, next) => {
   );
 });
 
+const forgotPassword = asyncHandler(async (req, res, next) => {
+  const { email } = req.body;
+
+  if (!email) return next(new ApiError(400, "Email is required"));
+
+  const user = await User.findOne({ where: { email } });
+  if (!user) return next(new ApiError(404, "User not found"));
+
+  // Generate 6 digit OTP
+  const otp = Math.floor(100000 + Math.random() * 900000).toString();
+
+  // Save OTP + expiry
+  user.resetOtp = otp;
+  user.resetOtpExpiry = Date.now() + 10 * 60 * 1000; // 10 mins
+  await user.save();
+
+  // Send email
+  await sendEmail(
+    user.email,
+    "Password Reset OTP",
+    `Your OTP is: ${otp}. It is valid for 10 minutes.`
+  );
+
+  res
+    .status(200)
+    .json(new ApiResponse(200, {}, "OTP sent to your email successfully"));
+});
+
+
+const verifyOtp = asyncHandler(async (req, res, next) => {
+  const { email, otp } = req.body;
+
+  if (!email || !otp) {
+    return next(new ApiError(400, "Email and OTP are required"));
+  }
+
+  const user = await User.findOne({ where: { email } });
+  if (!user || user.resetOtp !== otp || user.resetOtpExpiry < Date.now()) {
+    return next(new ApiError(400, "Invalid or expired OTP"));
+  }
+
+  res.status(200).json(
+    new ApiResponse(200, {}, "OTP verified successfully")
+  );
+});
+
+const resetPassword = asyncHandler(async (req, res, next) => {
+  const { newPassword, confirmPassword, email } = req.body;
+  
+  if (!newPassword || !confirmPassword || !email ) {
+    return next(new ApiError(400, "Both passwords are required and email is required "));
+  }
+
+  if (newPassword !== confirmPassword) {
+    return next(new ApiError(400, "Passwords do not match"));
+  }
+
+  const user = await User.findOne({ where: { email } });
+  if (!user) return next(new ApiError(404, "User not found"));
+
+  // Hash new password
+  user.password = await bcrypt.hash(newPassword, 10);
+  await user.save();
+
+  res.status(200).json(new ApiResponse(200, {}, "Password reset successfully"));
+});
 
 
 
-
-export {registerUser ,loginUser, logoutUser, totalUser, getUserProfile,updateUserProfile ,updatePassword}
+export {registerUser ,loginUser, logoutUser, totalUser, getUserProfile,updateUserProfile ,updatePassword, forgotPassword, verifyOtp , resetPassword}

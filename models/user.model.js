@@ -43,6 +43,14 @@ const User = sequelize.define("User", {
     type: DataTypes.ENUM("active", "inactive"),
     defaultValue: "active",
   },
+  resetOtp: {
+  type: DataTypes.STRING,
+  allowNull: true,
+},
+resetOtpExpiry: {
+  type: DataTypes.DATE,
+  allowNull: true,
+},
 }, {
   timestamps: true, // adds createdAt & updatedAt automatically
 });

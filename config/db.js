@@ -25,7 +25,7 @@ export const sequelize = new Sequelize(
 
 // Optional: Test connection
 export const connectDB = async () => {
-  try {
+  try { 
     await sequelize.authenticate();
     console.log("Postgres + Sequelize connected successfully");
   } catch (err) {

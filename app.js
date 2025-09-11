@@ -12,6 +12,7 @@ import ProductRoute from "./routes/product.route.js";
 import cartItemRoute from "./routes/cartItem.route.js";
 import orderRoute from "./routes/order.route.js";
 import paymentRoute from "./routes/payment.route.js";
+import webhookRoute from "./routes/webhook.route.js";
 
 const app = express();
 dotenv.config();
@@ -28,8 +29,9 @@ app.use(cors({
 
 console.log(`ye hosted version he ${process.env.CLIENT_URL} and ye local host he ${process.env.LOCAL_URL} `)
 
-app.use(express.json());
 app.use(cookieParser());
+app.use("/record", webhookRoute);
+app.use(express.json());
 
 // ------------------- Routes -------------------
 
@@ -38,6 +40,7 @@ app.use("/product", ProductRoute);
 app.use("/cartitem", cartItemRoute);
 app.use("/order", orderRoute);
 app.use("/payment", paymentRoute);
+// app.use("/record", webhookRoute);
 
 // Test route
 app.get("/", (req, res) => {
@@ -54,7 +57,7 @@ const startServer = async () => {
     await sequelize.authenticate(); // Test DB connection
     console.log("Postgres + Sequelize connected successfully");
 
-    // await sequelize.sync({ alter: true }); // Sync all models
+    await sequelize.sync({ alter: true }); // Sync all models
     console.log("All models synced successfully");
 
     const PORT = process.env.PORT || 8000;

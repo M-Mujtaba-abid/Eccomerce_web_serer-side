@@ -38,8 +38,8 @@ export const createCheckoutSession = asyncHandler(async (req, res) => {
     payment_method_types: ["card"],
     line_items,
     mode: "payment",
-    success_url: `${process.env.LOCAL_URL}/web/success?session_id={CHECKOUT_SESSION_ID}`,
-    cancel_url: `${process.env.LOCAL_URL}/web/cancel`,
+    success_url: `${process.env.CLIENT_URL}/web/success?session_id={CHECKOUT_SESSION_ID}`,
+    cancel_url: `${process.env.CLIENT_URL}/web/cancel`,
 
     // 👇 Metadata bhejna bohot important hai
     metadata: {
